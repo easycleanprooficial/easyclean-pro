@@ -1250,7 +1250,7 @@
           <span class="kit-pvp-val">$90.000</span>
         </div>
         <div class="kit-ahorro">✓ Cubre el 80% de tenis del mercado</div>
-        <div class="kit-ganancia">💰 Ganancia nivel Impulsor: hasta <strong>$53.000</strong></div>
+        <div class="kit-ganancia">💰 Ganancia nivel Impulsor: hasta <strong>$48.000</strong></div>
       </article>
 
       <article class="kit-card featured animate-in">
@@ -1262,7 +1262,7 @@
           <span class="kit-pvp-val">$90.000</span>
         </div>
         <div class="kit-ahorro">✓ Ideal para tenis de alta gama</div>
-        <div class="kit-ganancia">💰 Ganancia nivel Impulsor: hasta <strong>$49.000</strong></div>
+        <div class="kit-ganancia">💰 Ganancia nivel Impulsor: hasta <strong>$46.000</strong></div>
       </article>
 
       <article class="kit-card animate-in">
@@ -1274,7 +1274,7 @@
           <span class="kit-pvp-val">$80.000</span>
         </div>
         <div class="kit-ahorro">✓ El combo más versátil del catálogo</div>
-        <div class="kit-ganancia">💰 Ganancia nivel Impulsor: hasta <strong>$44.000</strong></div>
+        <div class="kit-ganancia">💰 Ganancia nivel Impulsor: hasta <strong>$40.000</strong></div>
       </article>
 
       <!-- KIT ESTRELLA: los 3 productos juntos -->
@@ -1288,21 +1288,21 @@
           <span class="kit-pvp-val" style="color:var(--ec-amber)">$120.000</span>
         </div>
         <div class="kit-ahorro" style="background:rgba(245,158,11,.12);color:#b45309;border:1px solid rgba(245,158,11,.3)">🔖 Ahorra $15.000 vs. comprar por separado — precio especial kit</div>
-        <div class="kit-ganancia" style="background:rgba(245,158,11,.12);color:#92400e;font-size:.92rem;margin-top:8px">
-          💰 Ganancia nivel Explorador: hasta <strong>$64.000</strong> &nbsp;·&nbsp; Impulsor: hasta <strong>$70.000</strong>
+        <div class="kit-ganancia" style="background:rgba(245,158,11,.12);color:#92400e;font-size:.88rem;margin-top:8px">
+          💰 Explorador: hasta <strong>$61.000</strong> &nbsp;·&nbsp; Impulsor: hasta <strong>$67.000</strong> &nbsp;·&nbsp; Embajador: hasta <strong>$72.000</strong>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;text-align:center;font-size:.78rem;color:#5a607a">
           <div style="background:var(--ec-bg);border-radius:8px;padding:8px 4px">
             <div style="font-weight:700;color:var(--ec-blue)">Explorador</div>
-            <div>desde $62.000</div>
+            <div>desde $69.000</div>
           </div>
           <div style="background:var(--ec-bg);border-radius:8px;padding:8px 4px">
             <div style="font-weight:700;color:var(--ec-blue)">Impulsor</div>
-            <div>desde $56.000</div>
+            <div>desde $63.000</div>
           </div>
           <div style="background:var(--ec-bg);border-radius:8px;padding:8px 4px">
             <div style="font-weight:700;color:var(--ec-blue)">Embajador</div>
-            <div>desde $53.000</div>
+            <div>desde $58.000</div>
           </div>
         </div>
       </article>
@@ -1450,8 +1450,8 @@
               Unidades por mes:
               <span class="range-value" id="val-unidades">30</span>
             </label>
-            <input type="range" id="calc-unidades" min="10" max="200" value="30" step="1" />
-            <div class="range-labels"><span>5 unidades</span><span>200 unidades</span></div>
+            <input type="range" id="calc-unidades" min="60" max="200" value="60" step="1" />
+            <div class="range-labels"><span id="rango-min-und">60 unidades</span><span>200 unidades</span></div>
           </div>
           <div class="calc-field" style="margin-bottom:0">
             <label>
@@ -1547,7 +1547,7 @@
       <!-- TODO: Testimonio real #1 -->
       <div class="testi-card animate-in">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-texto">"Empecé con el nivel Explorador con solo 5 unidades para probar. En la primera semana ya había vendido todo y subí a Impulsor. Los productos se venden solos porque la gente ve el resultado inmediatamente."</p>
+        <p class="testi-texto">"Empecé con el nivel Explorador, el paquete mínimo de 40 unidades. En la primera semana ya había vendido casi todo y subí a Impulsor. Los productos se venden solos porque la gente ve el resultado inmediatamente."</p>
         <div class="testi-autor">
           <div class="testi-avatar">M</div>
           <div>
@@ -1728,6 +1728,9 @@
     'kit-3-productos':   { n:'Kit los 3 Productos', min:115000, max:130000, c:{explorador:69000, impulsor:63000, embajador:58000} },
   };
 
+  /* Unidades mínimas de compra por nivel (pedido inicial) */
+  const NIVEL_MINS = { explorador: 40, impulsor: 60, embajador: 80 };
+
   /* Formato moneda robusto — funciona en todos los navegadores incluyendo Android antiguo */
   function f(n) {
     var num = Math.round(n);
@@ -1741,11 +1744,21 @@
   function calc() {
     const pk  = document.getElementById('calc-producto').value;
     const nk  = document.getElementById('calc-nivel').value;
-    const un  = parseInt(document.getElementById('calc-unidades').value);
     const pr  = document.getElementById('calc-precio');
+    const sliderUn = document.getElementById('calc-unidades');
 
     const p   = PRODS[pk];
     const cos = p.c[nk];
+
+    /* ── Error 3 fix: slider mínimo según nivel ── */
+    const minUn = NIVEL_MINS[nk];
+    sliderUn.min = minUn;
+    if (parseInt(sliderUn.value) < minUn) sliderUn.value = minUn;
+    const un = parseInt(sliderUn.value);
+
+    /* Actualizar etiqueta mínima del slider con el mínimo real del nivel */
+    var lblMin = document.getElementById('rango-min-und');
+    if (lblMin) lblMin.textContent = minUn + ' unidades';
 
     // Ajustar rango precio al producto
     pr.min = p.min;
@@ -1763,7 +1776,15 @@
     const inv      = cos * un;
     const ing      = pv  * un;
     const roi      = Math.round((ganUnit / cos) * 100);
-    const be       = Math.ceil(inv / ganUnit);
+
+    /* ── Error 1 fix: breakeven correcto ──────────────────────────────────
+       Pregunta correcta: ¿cuántas unidades debo VENDER para que mis
+       INGRESOS >= mi INVERSIÓN?  → ceil(inversión / precio_venta)
+       Fórmula anterior: ceil(inv / ganUnit) daba SIEMPRE > unidades
+       disponibles cuando ROI < 100%, resultado físicamente imposible.
+    ─────────────────────────────────────────────────────────────────────── */
+    const be = Math.ceil(inv / pv);
+    const gananciaLibre = (un - be) * ganUnit; /* ganancia de las unidades restantes */
 
     const ganEl = document.getElementById('result-ganancia');
     ganEl.textContent = f(ganTotal);
@@ -1776,6 +1797,12 @@
     document.getElementById('result-ingresos').textContent  = f(ing);
     document.getElementById('result-roi').textContent       = roi + '%';
     document.getElementById('result-breakeven').textContent = be + ' unidades';
+
+    /* Actualizar texto explicativo del breakeven */
+    var recuperaEl = document.querySelector('.result-recupera');
+    if (recuperaEl) {
+      recuperaEl.innerHTML = 'Vende <strong id="result-breakeven">' + be + ' unidades</strong> y recuperas tu inversión — las <strong>' + (un - be) + ' restantes</strong> son <span style="color:var(--ec-amber);">ganancia pura (' + f(gananciaLibre) + ')</span>';
+    }
   }
 
   /* Selectores: 'change' es más confiable en móviles (Samsung Internet, Android WebView) */
